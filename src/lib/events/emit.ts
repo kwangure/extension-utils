@@ -17,26 +17,19 @@ export async function sendMessageToTabs(message: {
             tabs = await chrome.tabs.query(message.tabs);
         }
 
-        for (const { id, status, url } of tabs) {
+        const sendMessagePromises = [];
+        for (const { id, status } of tabs) {
             // Ignore tabs in loading status
             if (status !== "complete") break;
 
-            chrome.tabs.sendMessage(id, message, {}, () => {
-                const { lastError } = chrome.runtime;
-                if (lastError) {
-                    console.error(`Unable to send message to tab (url: ${url}, id: ${id}, status: ${status}).`, lastError.message);
-                }
-            });
+            sendMessagePromises.push(chrome.tabs.sendMessage(id, message, {}));
         }
+
+        return Promise.all(sendMessagePromises);
     }
 }
 
 export function sendMessageToRuntime(message) {
     // Send messages to other frames e.g extension url, options, popup etc.
-    chrome.runtime.sendMessage(message, () => {
-        const { lastError } = chrome.runtime;
-        if (lastError) {
-            console.error("Unable to send message to runtime.", lastError.message);
-        }
-    });
+    return chrome.runtime.sendMessage(message);
 }
