@@ -1,0 +1,19 @@
+{
+    "name": "extension-fixture",
+    "version": "0.0.1",
+    "manifest_version": 2,
+    "content_scripts": [{
+        "matches": ["<all_urls>"],
+        "run_at": "document_end",
+        "js": ["/inject-content.js"]
+    }],
+    "web_accessible_resources": [
+        "**/*.js",
+        "**/*.css"
+    ],
+    "background": {
+        "page": "background.html",
+        "persistent": true
+    },
+    "devtools_page": "devtools.html"
+}
